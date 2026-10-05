@@ -34,7 +34,7 @@ class Prestataire extends BaseModel
     public function creer($data)
     {
         $sql = "INSERT INTO PRESTATAIRE (ID_PRESTATAIRE, NOM_PRESTATAIRE, PRENOM_PRESTATAIRE) 
-                VALUES ((SELECT NVL(MAX(ID_PRESTATAIRE), 0) + 1 FROM Prestataire), :nom, :prenom)";
+                VALUES ((SELECT COALESCE(MAX(ID_PRESTATAIRE), 0) + 1 FROM Prestataire), :nom, :prenom)";
         return $this->executeModify($sql, [
             ':nom' => $data['NOM_PRESTATAIRE'],
             ':prenom' => $data['PRENOM_PRESTATAIRE']

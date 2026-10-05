@@ -26,7 +26,7 @@ class Soin extends BaseModel
      */
     public function creer($data)
     {
-        $sql = "INSERT INTO SOIN (ID_SOIGNEUR, ID_VETERINAIRE,ID_ANIMAL, DATE_SOIN, DESCRIPTION_SOIN) VALUES (:id_personnel, :id_veterinaire, :id_animal, TO_DATE(:date_soin, 'YYYY-MM-DD'), :description_soin)";
+        $sql = "INSERT INTO SOIN (ID_SOIGNEUR, ID_VETERINAIRE,ID_ANIMAL, DATE_SOIN, DESCRIPTION_SOIN) VALUES (:id_personnel, :id_veterinaire, :id_animal, :date_soin, :description_soin)";
         $result = $this->executeModify($sql, [
             ':id_personnel' => $data['ID_PERSONNEL'],
             ':id_veterinaire' => $data['ID_VETERINAIRE'],

@@ -5,9 +5,9 @@ class Reparation extends BaseModel
     public function getAll()
     {
         //Retourne toutes les réparations effectuées sur un enclos donné (avec les détails du personnel et du prestataire s'il y en a eu un)
-        $sql = "SELECT R.*, P.NOM, P.PRENOM,PR.NOM_PRESTATAIRE 
-        FROM REPARATION R 
-        LEFT JOIN PERSONNEL P ON R.ID_PERSONNEL = P.ID_PERSONNEL 
+        $sql = "SELECT R.*, P.NOM, P.PRENOM,PR.NOM_PRESTATAIRE
+        FROM REPARATION R
+        LEFT JOIN PERSONNEL P ON R.ID_PERSONNEL = P.ID_PERSONNEL
         LEFT JOIN PRESTATAIRE PR ON R.ID_PRESTATAIRE = PR.ID_PRESTATAIRE;";
         return $this->executeQueryAll($sql);
     }
@@ -15,11 +15,11 @@ class Reparation extends BaseModel
     public function getReparation($dateDebut, $longitude, $latitude)
     {
         //Retourne toutes les réparations effectuées sur un enclos donné (avec les détails du personnel et du prestataire s'il y en a eu un)
-        $sql = "SELECT R.*, P.NOM, P.PRENOM,PR.NOM_PRESTATAIRE 
-        FROM REPARATION R 
-        LEFT JOIN PERSONNEL P ON R.ID_PERSONNEL = P.ID_PERSONNEL 
+        $sql = "SELECT R.*, P.NOM, P.PRENOM,PR.NOM_PRESTATAIRE
+        FROM REPARATION R
+        LEFT JOIN PERSONNEL P ON R.ID_PERSONNEL = P.ID_PERSONNEL
         LEFT JOIN PRESTATAIRE PR ON R.ID_PRESTATAIRE = PR.ID_PRESTATAIRE
-        WHERE R.DATE_DEBUT_REPARATION = TO_DATE(:date_debut, 'DD/MM/YY') AND R.LONGITUDE_ENCLOS = :longitude AND R.LATITUDE_ENCLOS = :latitude;";
+        WHERE R.DATE_DEBUT_REPARATION = STR_TO_DATE(:date_debut, '%d/%m/%y') AND R.LONGITUDE_ENCLOS = :longitude AND R.LATITUDE_ENCLOS = :latitude;";
         return $this->executeQuery($sql, [
             ':date_debut' => $dateDebut,
             ':longitude' => $longitude,
@@ -31,7 +31,7 @@ class Reparation extends BaseModel
     {
         //Retourne toutes les réparations effectuées par un personnel donné (avec les détails de l'enclos réparé, de la zone et du prestataire)
         $sql = "SELECT R.*, E.ID_ZONE, E.TYPE_ENCLOS, Z.NOM_ZONE, PR.NOM_PRESTATAIRE, PR.PRENOM_PRESTATAIRE
-                FROM REPARATION R 
+                FROM REPARATION R
                 JOIN ENCLOS E ON R.LATITUDE_ENCLOS = E.LATITUDE AND R.LONGITUDE_ENCLOS = E.LONGITUDE
                 JOIN ZONE Z ON E.ID_ZONE = Z.ID_ZONE
                 LEFT JOIN PRESTATAIRE PR ON R.ID_PRESTATAIRE = PR.ID_PRESTATAIRE
@@ -43,11 +43,11 @@ class Reparation extends BaseModel
     public function getParEnclos($latitude, $longitude)
     {
         //Retourne toutes les réparations effectuées sur un enclos donné (avec les détails du personnel et du prestataire s'il y en a eu un)
-        $sql = "SELECT R.*, P.NOM, P.PRENOM,PR.NOM_PRESTATAIRE 
-        FROM REPARATION R 
-        LEFT JOIN PERSONNEL P ON R.ID_PERSONNEL = P.ID_PERSONNEL 
-        LEFT JOIN PRESTATAIRE PR ON R.ID_PRESTATAIRE = PR.ID_PRESTATAIRE 
-        WHERE R.LATITUDE_ENCLOS = :latitude AND R.LONGITUDE_ENCLOS = :longitude 
+        $sql = "SELECT R.*, P.NOM, P.PRENOM,PR.NOM_PRESTATAIRE
+        FROM REPARATION R
+        LEFT JOIN PERSONNEL P ON R.ID_PERSONNEL = P.ID_PERSONNEL
+        LEFT JOIN PRESTATAIRE PR ON R.ID_PRESTATAIRE = PR.ID_PRESTATAIRE
+        WHERE R.LATITUDE_ENCLOS = :latitude AND R.LONGITUDE_ENCLOS = :longitude
         ORDER BY R.DATE_DEBUT_REPARATION DESC";
 
         return $this->executeQueryAll($sql, [':latitude' => $latitude, ':longitude' => $longitude]);
@@ -65,12 +65,12 @@ class Reparation extends BaseModel
                     NATURE_REPARATION,
                     COUT_REPARATION
                 ) VALUES (
-                    TO_DATE(:date_debut_reparation, 'YYYY-MM-DD'),
+                    ,
                     :latitude_enclos,
                     :longitude_enclos,
                     :id_personnel,
                     :id_prestataire,
-                    TO_DATE(:date_fin, 'YYYY-MM-DD'),
+                    ,
                     :nature_reparation,
                     :cout_reparation
                 )";
@@ -94,19 +94,19 @@ class Reparation extends BaseModel
 
     /**
      * Met à jour une réparation existante
-     * 
+     *
      * @param array $data Données à mettre à jour (contient DATE_DEBUT_REPARATION, LATITUDE_ENCLOS, LONGITUDE_ENCLOS, etc.)
      * @return bool Succès de l'opération
      */
     public function update($data)
     {
-        $sql = "UPDATE REPARATION 
+        $sql = "UPDATE REPARATION
                 SET ID_PRESTATAIRE = :id_prestataire,
-                    DATE_FIN = TO_DATE(:date_fin,'YYYY-MM-DD'),
+                    DATE_FIN = :date_fin,
                     NATURE_REPARATION = :nature_reparation,
                     COUT_REPARATION = :cout_reparation
-                WHERE DATE_DEBUT_REPARATION = TO_DATE(:date_debut,'DD/MM/YY') 
-                AND LATITUDE_ENCLOS = :latitude 
+                WHERE DATE_DEBUT_REPARATION = STR_TO_DATE(:date_debut, '%d/%m/%y')
+                AND LATITUDE_ENCLOS = :latitude
                 AND LONGITUDE_ENCLOS = :longitude";
 
         return $this->executeModify($sql, [
@@ -122,7 +122,7 @@ class Reparation extends BaseModel
 
     /**
      * Supprime une réparation
-     * 
+     *
      * @param string $dateDebut Date de début de la réparation
      * @param float $latitude Latitude de l'enclos
      * @param float $longitude Longitude de l'enclos
@@ -130,9 +130,9 @@ class Reparation extends BaseModel
      */
     public function suppr($dateDebut, $latitude, $longitude)
     {
-        $sql = "DELETE FROM REPARATION 
-                WHERE DATE_DEBUT_REPARATION = TO_DATE(:date_debut, 'DD/MM/YY') 
-                AND LATITUDE_ENCLOS = :latitude 
+        $sql = "DELETE FROM REPARATION
+                WHERE DATE_DEBUT_REPARATION = STR_TO_DATE(:date_debut, '%d/%m/%y')
+                AND LATITUDE_ENCLOS = :latitude
                 AND LONGITUDE_ENCLOS = :longitude";
         return $this->executeModify($sql, [
             ':date_debut' => $dateDebut,

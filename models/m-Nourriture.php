@@ -10,7 +10,7 @@ class Nourriture extends BaseModel
 
     public function creer($data)
     {
-        $sql = "INSERT INTO EST_NOURRI (ID_ANIMAL, ID_PERSONNEL, DATE_NOURRIT, DOSE_NOURRITURE) VALUES (:id_animal, :id_personnel, TO_DATE(:date_nourrit, 'YYYY-MM-DD'), TO_NUMBER(:dose_nourriture, '9999.99'))";
+        $sql = "INSERT INTO EST_NOURRI (ID_ANIMAL, ID_PERSONNEL, DATE_NOURRIT, DOSE_NOURRITURE) VALUES (:id_animal, :id_personnel, :date_nourrit, :dose_nourriture)";
         return $this->executeModify($sql, [
             ':id_animal' => $data['ID_ANIMAL'],
             ':id_personnel' => $data['ID_PERSONNEL'],

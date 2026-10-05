@@ -210,7 +210,7 @@ class ServiceAnimal
         }
         
         if (isset($_POST['poids_modif'])) {
-            $poids = str_replace('.', ',', $_POST['poids_modif']);
+            $poids = str_replace(',', '.', $_POST['poids_modif']);
         }
         //Met à jour les données d'un animal
         $data = [

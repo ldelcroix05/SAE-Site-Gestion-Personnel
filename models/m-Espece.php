@@ -16,7 +16,7 @@ class Espece extends BaseModel
     public function creer($data)
     {
         $query = "INSERT INTO Espece (ID_ESPECE, NOM_ESPECE, NOM_LATIN_ESPECE, EST_MENACEE) 
-                 VALUES ((SELECT NVL(MAX(ID_ESPECE), 0) + 1 FROM Espece), :nom_espece, :nom_latin_espece, :est_menacee)";
+                 VALUES ((SELECT COALESCE(MAX(ID_ESPECE), 0) + 1 FROM Espece), :nom_espece, :nom_latin_espece, :est_menacee)";
         return $this->executeModify($query, [
             ':nom_espece' => $data['nom_espece'],
             ':nom_latin_espece' => $data['nom_latin_espece'],

@@ -52,7 +52,7 @@ class Boutique extends BaseModel
     public function creer($data)
     {
         $sql = "INSERT INTO Boutique (ID_BOUTIQUE,ID_MANAGER,ID_ZONE,NOM_BOUTIQUE,DESCRIPTION_BOUTIQUE) 
-            VALUES ((SELECT NVL(MAX(ID_BOUTIQUE), 0) + 1 FROM Boutique), :id_manager, :id_zone, :nom_boutique, :description_boutique)";
+            VALUES ((SELECT COALESCE(MAX(ID_BOUTIQUE), 0) + 1 FROM Boutique), :id_manager, :id_zone, :nom_boutique, :description_boutique)";
         return $this->executeModify($sql, [
             ':id_manager' => $data['id_manager'],
             ':id_zone' => $data['id_zone'],

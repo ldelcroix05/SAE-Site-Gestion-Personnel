@@ -111,10 +111,10 @@ class Animal extends BaseModel
      */
     public function creer($data)
     {
-        $data['poids'] = str_replace('.', ',', $data['poids']);
+        $data['poids'] = str_replace(',', '.', $data['poids']);
 
         $query = "INSERT INTO Animal (ID_ANIMAL, NOM_ANIMAL, DATE_NAISSANCE, POIDS, REGIME_ALIMENTAIRE, ID_ESPECE, LATITUDE_ENCLOS, LONGITUDE_ENCLOS, ID_SOIGNEUR) 
-                 VALUES ((SELECT NVL(MAX(ID_ANIMAL), 0) + 1 FROM Animal), :nom_animal, TO_DATE(:date_naissance, 'YYYY-MM-DD'), :poids, :regime_alimentaire, :id_espece, :latitude_enclos, :longitude_enclos, :id_soigneur)";
+                 VALUES ((SELECT COALESCE(MAX(ID_ANIMAL), 0) + 1 FROM Animal), :nom_animal, :date_naissance, :poids, :regime_alimentaire, :id_espece, :latitude_enclos, :longitude_enclos, :id_soigneur)";
 
         return $this->executeModify($query, [
             ':nom_animal' => $data['nom_animal'],
@@ -134,11 +134,11 @@ class Animal extends BaseModel
     public function maj($id, $data)
     {
         // Normaliser le poids
-        $data['poids'] = str_replace('.', ',', $data['poids']);
+        $data['poids'] = str_replace(',', '.', $data['poids']);
 
         $query = "UPDATE Animal SET 
                  NOM_ANIMAL = :nom_animal,
-                 DATE_NAISSANCE = TO_DATE(:date_naissance, 'YYYY-MM-DD'),
+                 DATE_NAISSANCE = :date_naissance,
                  POIDS = :poids,
                  REGIME_ALIMENTAIRE = :regime_alimentaire,
                  ID_ESPECE = :id_espece,
@@ -203,13 +203,13 @@ class Animal extends BaseModel
         
         // Filtre Date de naissance (après)
         if (!empty($filters['date_naissance_min'])) {
-            $sql .= " AND A.DATE_NAISSANCE >= TO_DATE(:date_min, 'YYYY-MM-DD')";
+            $sql .= " AND A.DATE_NAISSANCE >= :date_min";
             $params[':date_min'] = $filters['date_naissance_min'];
         }
         
         // Filtre Date de naissance (avant)
         if (!empty($filters['date_naissance_max'])) {
-            $sql .= " AND A.DATE_NAISSANCE <= TO_DATE(:date_max, 'YYYY-MM-DD')";
+            $sql .= " AND A.DATE_NAISSANCE <= :date_max";
             $params[':date_max'] = $filters['date_naissance_max'];
         }
         

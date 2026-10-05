@@ -3,7 +3,7 @@ class ContratTravail extends BaseModel
 {
     private function getNextIdContrat()
     {
-        $sqlSeq = "SELECT NVL(MAX(ID_CONTRAT), 0) + 1 AS NEW_ID FROM CONTRAT_TRAVAIL";
+        $sqlSeq = "SELECT COALESCE(MAX(ID_CONTRAT), 0) + 1 AS NEW_ID FROM CONTRAT_TRAVAIL";
         $row = $this->executeQuery($sqlSeq);
         return $row['NEW_ID'];
     }
@@ -28,7 +28,7 @@ class ContratTravail extends BaseModel
         $newId = $this->getNextIdContrat();
 
         $sql = "INSERT INTO CONTRAT_TRAVAIL (ID_CONTRAT, ID_PERSONNEL, ID_FONCTION, DATE_DEBUT, DATE_FIN)
-                VALUES (:id_contrat, :id_personnel, :id_fonction, TO_DATE(:date_debut, 'YYYY-MM-DD'), TO_DATE(:date_fin, 'YYYY-MM-DD'))";
+                VALUES (:id_contrat, :id_personnel, :id_fonction, :date_debut, :date_fin)";
 
         $dateFin = !empty($data['DATE_FIN']) ? $data['DATE_FIN'] : null;
 
@@ -48,7 +48,7 @@ class ContratTravail extends BaseModel
                   FROM Contrat_Travail CT
                   JOIN Personnel P ON CT.ID_PERSONNEL = P.ID_PERSONNEL
                   JOIN Fonction F ON CT.ID_FONCTION = F.ID_FONCTION
-                  WHERE CT.DATE_FIN <= SYSDATE + 30
+                  WHERE CT.DATE_FIN <= CURRENT_DATE + 30
                   ORDER BY CT.DATE_FIN ASC";
         return $this->executeQueryAll($query);
     }

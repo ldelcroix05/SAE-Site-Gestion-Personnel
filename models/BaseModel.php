@@ -2,12 +2,12 @@
 
 /**
  * Classe de base pour tous les modèles
- * Centralise la logique OCI pour éviter la duplication de code
+ * Centralise la logique PDO pour éviter la duplication de code
  */
 class BaseModel
 {
     /**
-     * Exécute une requête OCI et retourne un seul résultat
+     * Exécute une requête préparée et retourne un seul résultat
      * 
      * @param string $query Requête SQL
      * @param array $params Tableau associatif des paramètres [':param_name' => $value]
@@ -15,26 +15,13 @@ class BaseModel
      */
     protected function executeQuery($query, $params = [])
     {
-        $db = Database::getConnection();
-        $stid = oci_parse($db, $query);
-
-        // Bind all parameters
-        foreach ($params as $key => $value) {
-            oci_bind_by_name($stid, $key, $params[$key]);
-        }
-
-        // Execute
-        $r = oci_execute($stid);
-        if (!$r) {
-            $e = oci_error($stid);
-            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-        }
-
-        return oci_fetch_assoc($stid);
+        $statement = Database::getConnection()->prepare($query);
+        $statement->execute($params);
+        return $statement->fetch();
     }
 
     /**
-     * Exécute une requête OCI et retourne tous les résultats sous forme de tableau
+     * Exécute une requête préparée et retourne tous les résultats sous forme de tableau
      * 
      * @param string $query Requête SQL
      * @param array $params Tableau associatif des paramètres [':param_name' => $value]
@@ -42,24 +29,9 @@ class BaseModel
      */
     public function executeQueryAll($query, $params = [])
     {
-        $db = Database::getConnection();
-        $stid = oci_parse($db, $query);
-
-        // Bind all parameters
-        foreach ($params as $key => $value) {
-            oci_bind_by_name($stid, $key, $params[$key]);
-        }
-
-        // Execute
-        $r = oci_execute($stid);
-        if (!$r) {
-            $e = oci_error($stid);
-            trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
-        }
-
-        $result = [];
-        oci_fetch_all($stid, $result, 0, -1, OCI_FETCHSTATEMENT_BY_ROW + OCI_ASSOC);
-        return $result;
+        $statement = Database::getConnection()->prepare($query);
+        $statement->execute($params);
+        return $statement->fetchAll();
     }
 
     /**
@@ -72,21 +44,7 @@ class BaseModel
      */
     protected function executeModify($query, $params = [])
     {
-        $db = Database::getConnection();
-        $stid = oci_parse($db, $query);
-
-        // Bind all parameters
-        foreach ($params as $key => $value) {
-            oci_bind_by_name($stid, $key, $params[$key]);
-        }
-
-        // Execute
-        $r = oci_execute($stid);
-        if (!$r) {
-            $e = oci_error($stid);
-            return 0;
-        }
-
-        return $r;
+        $statement = Database::getConnection()->prepare($query);
+        return $statement->execute($params);
     }
 }

@@ -4,15 +4,15 @@ class User extends BaseModel
 
     private function getNextIdPersonnel()
     {
-        $sqlSeq = "SELECT NVL(MAX(ID_PERSONNEL), 0) + 1 AS NEW_ID FROM Personnel";
+        $sqlSeq = "SELECT COALESCE(MAX(ID_PERSONNEL), 0) + 1 AS NEW_ID FROM Personnel";
         $row = $this->executeQuery($sqlSeq);
         return $row['NEW_ID'];
     }
 
-    //Retourne le dernier ID ajouté dans la BD (donc NVL(MAX(ID_PERSONNEL),0)) car séquences interdites
+    //Retourne le dernier ID ajouté dans la BD (donc COALESCE(MAX(ID_PERSONNEL),0)) car séquences interdites
     public function getLastInsertId()
     {
-        $sqlSeq = "SELECT NVL(MAX(ID_PERSONNEL), 0) AS LAST_ID FROM Personnel";
+        $sqlSeq = "SELECT COALESCE(MAX(ID_PERSONNEL), 0) AS LAST_ID FROM Personnel";
         return $this->executeQuery($sqlSeq);
     }
 
@@ -31,8 +31,8 @@ class User extends BaseModel
     public function getParID($id)
     {
         $sql = "SELECT Personnel.*, Fonction.ID_Fonction, Fonction.Nom_Fonction
-            FROM Personnel 
-            LEFT JOIN Fonction ON Personnel.ID_Fonction = Fonction.ID_Fonction 
+            FROM Personnel
+            LEFT JOIN Fonction ON Personnel.ID_Fonction = Fonction.ID_Fonction
             WHERE ID_Personnel = :id";
         return $this->executeQuery($sql, [':id' => $id]);
     }
@@ -78,7 +78,7 @@ class User extends BaseModel
         $new_id = $this->getNextIdPersonnel();
 
         $sql = "INSERT INTO Personnel (ID_Personnel, Nom, Prenom, Mail, MDP, Date_Entree, Salaire, ID_Fonction, LOGIN, ID_Remplacant, ID_Superieur)
-            VALUES (:id_personnel, :nom, :prenom, :mail, :MDP, TO_DATE(:date_entree, 'YYYY-MM-DD'), :salaire, :ID_Fonction, :login, :ID_Remplacant, :ID_Superieur)";
+            VALUES (:id_personnel, :nom, :prenom, :mail, :MDP, :date_entree, :salaire, :ID_Fonction, :login, :ID_Remplacant, :ID_Superieur)";
 
         $nom = $data['nom'] ?? null;
         $prenom = $data['prenom'] ?? null;
@@ -119,10 +119,10 @@ class User extends BaseModel
      */
     public function maj($id, $data)
     {
-        $sql = 'UPDATE Personnel 
-            SET Nom = :nom, Prenom = :prenom, Mail = :mail, MDP = :MDP, 
-                Date_Entree = TO_DATE(:date_entree, \'YYYY-MM-DD\'), Salaire = :salaire, ID_Fonction = :ID_Fonction, LOGIN = :login, 
-                ID_Remplacant = :ID_Remplacant, ID_Superieur = :ID_Superieur 
+        $sql = 'UPDATE Personnel
+            SET Nom = :nom, Prenom = :prenom, Mail = :mail, MDP = :MDP,
+                Date_Entree = :date_entree, Salaire = :salaire, ID_Fonction = :ID_Fonction, LOGIN = :login,
+                ID_Remplacant = :ID_Remplacant, ID_Superieur = :ID_Superieur
             WHERE ID_Personnel = :id';
 
         $nom = $data['nom'] ?? null;
@@ -163,10 +163,10 @@ class User extends BaseModel
 
     public function moteurRechercheRecup($searchTerm, $filters = [])
     {
-        $sql = "SELECT P.*, F.NOM_FONCTION 
-                 FROM PERSONNEL P 
+        $sql = "SELECT P.*, F.NOM_FONCTION
+                 FROM PERSONNEL P
                  LEFT JOIN FONCTION F ON P.ID_FONCTION = F.ID_FONCTION
-                 WHERE (LOWER(P.NOM) LIKE LOWER(:searchTerm) 
+                 WHERE (LOWER(P.NOM) LIKE LOWER(:searchTerm)
                         OR LOWER(P.PRENOM) LIKE LOWER(:searchTerm)
                         OR LOWER(P.MAIL) LIKE LOWER(:searchTerm)
                         OR LOWER(P.LOGIN) LIKE LOWER(:searchTerm))
